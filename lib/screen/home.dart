@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pemula/api/repository.dart';
 import 'package:flutter_pemula/component/post_view.dart';
 import 'package:flutter_pemula/model/post.dart';
+import 'package:flutter_pemula/screen/add_edit_post_screen.dart';
 
 class Home extends StatefulWidget {
   final String title;
@@ -90,7 +91,12 @@ class _HomeState extends State<Home> {
       body: _buildPostList(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          //TODO action to add and edit post
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AddEditPostScreen(),
+            ),
+          );
         },
         child: const Icon(Icons.add),
       ),
