@@ -81,6 +81,20 @@ class _HomeState extends State<Home> {
     }
   }
 
+  Future<void> _deletePost(int postId) async {
+    try {
+      final response = await _apiService.deletePost(postId);
+      if (response) {
+        setState(() {
+          _posts.removeWhere((post) => post.id == postId);
+        });
+        _loadMorePosts();
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,13 +104,19 @@ class _HomeState extends State<Home> {
       ),
       body: _buildPostList(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          var result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const AddEditPostScreen(),
             ),
           );
+          if (result == true) {
+            _currentPage = 1;
+            _posts.clear();
+            _hasMore = true;
+            _loadPosts();
+          }
         },
         child: const Icon(Icons.add),
       ),
@@ -128,8 +148,20 @@ class _HomeState extends State<Home> {
                     top: 2,
                     right: 2,
                     child: IconButton(
-                      onPressed: () {
-                        // TODO action to edit post
+                      onPressed: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddEditPostScreen(post: post),
+                          ),
+                        );
+
+                        if (result == true) {
+                          _currentPage = 1;
+                          _posts.clear();
+                          _hasMore = true;
+                          _loadPosts();
+                        }
                       },
                       icon: const Icon(Icons.edit_rounded),
                     ),
@@ -138,9 +170,7 @@ class _HomeState extends State<Home> {
                     bottom: 2,
                     right: 2,
                     child: IconButton(
-                      onPressed: () {
-                        //TODO action delete post
-                      },
+                      onPressed: () => _deletePost(post.id),
                       icon: const Icon(Icons.delete_rounded),
                     ),
                   )
